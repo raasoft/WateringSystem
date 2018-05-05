@@ -1,0 +1,403 @@
+<html>
+<head>
+<title>Arduino Yun I/O shield</title>
+<script type="text/javascript">
+	window.onload=CaricaStatoPin;
+
+	function CaricaStatoPin(){
+		leggiStato();
+	}
+
+	function leggiStato(){
+		setTimeout(leggiStato, 2000);
+		document.getElementById("descrizione").innerHTML = "--- Attendi ... ---";
+		server = "http://gsiot-kb15-1459.try.yaler.net/arduino/time/get"; ///arduino/stato/99";
+		richiesta = new XMLHttpRequest();
+		richiesta.onreadystatechange = updateasincronoStato;
+		richiesta.setHeader("Access-Control-Allow-Origin", "*");//cross domain request/CORS
+		richiesta.open("GET", server, true);
+		richiesta.send(null);
+	}
+
+	function updateasincronoStato2(){
+	if ((richiesta.readyState == 4) && (richiesta.status == 200))
+	{
+		esito = richiesta.responseText;
+		document.getElementById("descrizione").innerHTML = esito;
+		pippo = esito.split("#");
+		document.getElementById("descrizione").innerHTML = pippo;
+		
+for(i = 1; i < pippo.length; i++){
+			PinPair = pippo[i];
+			iparr = PinPair.split("=");
+			PN = iparr[0];
+			PinStato = iparr[1];
+			if (PN > 7)
+			{
+				ActNum = "action" + PN;
+				ImgNum = "image" + PN;
+				
+				if (PinStato == 0)
+				{
+					PinAct = "1";
+					Immagine = "off.jpg";
+				}
+				else
+				{
+					PinAct = "0";
+					Immagine = "on.jpg";
+				}
+				
+				document.getElementById(ActNum).value = PinAct;
+				document.getElementById(ImgNum).src = Immagine;
+			}
+
+			if (PN == 2 || PN == 4 || PN == 7)
+			{
+				ImgNum = "image" + PN;
+				if (PinStato == 1) { Immagine = "led_off.png"; }
+				else { Immagine = "led_on.png"; }
+
+				document.getElementById(ImgNum).src = Immagine;
+			}
+
+			if (PN == 3 || PN == 5 || PN == 6) {
+				PinVal = parseInt(iparr[1]);
+				DacNum = "dac" + PN;
+				ValNum = "ValoreDac" + PN;
+				document.getElementById(DacNum).value = PinVal;
+				document.getElementById(ValNum).innerHTML = PinVal;
+			}
+
+			if (PN.substr(0,1) == "A") {
+				PinVal = parseInt(iparr[1]);
+				AnalogNum = "analog" + PN.substr(1,2);
+				document.getElementById(AnalogNum).value = PinVal;
+			}
+			}
+		}
+	}
+
+	function updateasincronoStato(){
+	if ((richiesta.readyState == 4) && (richiesta.status == 200))
+	{
+		esito = richiesta.responseText;
+		document.getElementById("descrizione").innerHTML = esito;
+		pippo = esito.split("#");
+		document.getElementById("descrizione").innerHTML = pippo;
+		
+		for(i = 1; i < pippo.length; i++){
+			PinPair = pippo[i];
+			iparr = PinPair.split("=");
+			PN = iparr[0];
+			PinStato = iparr[1];
+			if (PN > 7)
+			{
+				ActNum = "action" + PN;
+				ImgNum = "image" + PN;
+				
+				if (PinStato == 0)
+				{
+					PinAct = "1";
+					Immagine = "off.jpg";
+				}
+				else
+				{
+					PinAct = "0";
+					Immagine = "on.jpg";
+				}
+				
+				document.getElementById(ActNum).value = PinAct;
+				document.getElementById(ImgNum).src = Immagine;
+			}
+
+			if (PN == 2 || PN == 4 || PN == 7)
+			{
+				ImgNum = "image" + PN;
+				if (PinStato == 1) { Immagine = "led_off.png"; }
+				else { Immagine = "led_on.png"; }
+
+				document.getElementById(ImgNum).src = Immagine;
+			}
+
+			if (PN == 3 || PN == 5 || PN == 6) {
+				PinVal = parseInt(iparr[1]);
+				DacNum = "dac" + PN;
+				ValNum = "ValoreDac" + PN;
+				document.getElementById(DacNum).value = PinVal;
+				document.getElementById(ValNum).innerHTML = PinVal;
+			}
+
+			if (PN.substr(0,1) == "A") {
+				PinVal = parseInt(iparr[1]);
+				AnalogNum = "analog" + PN.substr(1,2);
+				document.getElementById(AnalogNum).value = PinVal;
+			}
+			}
+		}
+	}
+
+
+
+	function spedisciRele(Pin,Azione){
+
+		document.getElementById("descrizione").innerHTML = "--- Attendi ... ---";
+		server = "/arduino/digital/" + Pin + "/" + Azione;
+		richiesta = new XMLHttpRequest();
+		richiesta.onreadystatechange = updateasincronoRele;
+		richiesta.open("GET", server, true);
+		richiesta.send(null);
+
+	}
+
+	function updateasincronoRele(){
+
+		if ((richiesta.readyState == 4) && (richiesta.status == 200))
+		{
+			esito = richiesta.responseText;
+			document.getElementById("descrizione").innerHTML = esito;
+			iparr = esito.split(",");
+			PinType = iparr[0];
+			PinNum = iparr[1];
+			PinStato = iparr[2];
+			ActNum = "action" + PinNum;
+			ImgNum = "image" + PinNum;
+			
+			if (PinStato == 0)
+			{
+				PinAct = "1";
+				Immagine = "off.jpg";
+				}
+			else
+			{
+				PinAct = "0";
+				Immagine = "on.jpg";
+			}
+			
+			document.getElementById(ActNum).value = PinAct;
+			document.getElementById(ImgNum).src = Immagine;
+			document.getElementById("descrizione").innerHTML = esito;
+		}
+	}
+
+	function spedisciDac(Pin,Valore){
+
+		ValNum = "ValoreDac" + Pin;
+		document.getElementById(ValNum).innerHTML=Valore;
+		document.getElementById("descrizione").innerHTML = "--- Attendi ... ---";
+		server = "/arduino/dac/" + Pin + "/" + Valore;
+		richiesta = new XMLHttpRequest();
+		richiesta.onreadystatechange = updateasincronoDac;
+		richiesta.open("GET", server, true);
+		richiesta.send(null);
+
+	}
+
+	function updateasincronoDac() {
+		if ((richiesta.readyState == 4) && (richiesta.status == 200))
+		{
+			esito = richiesta.responseText;
+			iparr = esito.split(",");
+			PinType = iparr[0];
+			PinNum = iparr[1];
+			PinVal = parseInt(iparr[2]);
+			DacNum = "dac" + PinNum;
+			ValNum = "ValoreDac" + PinNum;
+			document.getElementById(DacNum).value = PinVal;
+			document.getElementById(ValNum).innerHTML = PinVal;
+			document.getElementById("descrizione").innerHTML = esito;
+			}
+	}
+
+	function updateasincronoAnalog(){
+		if ((richiesta.readyState == 4) && (richiesta.status == 200))
+		{
+			esito = richiesta.responseText;
+			iparr = esito.split(",");
+			PinType = iparr[0];
+			PinNum = iparr[1];
+			PinVal = parseInt(iparr[2]);
+			AnalogNum = "analog" + PinNum;
+
+			document.getElementById(AnalogNum).value = PinVal;
+			document.getElementById("descrizione").innerHTML = esito;
+			}
+	}
+
+	function updateasincronoDigital(){
+		if ((richiesta.readyState == 4) && (richiesta.status == 200))
+		{
+			esito = richiesta.responseText;
+			document.getElementById("descrizione").innerHTML = esito;
+			iparr = esito.split(",");
+			PinType = iparr[0];
+			PinNum = iparr[1];
+			PinStato = iparr[2];
+			ImgNum = "image" + PinNum;
+			if (PinStato == 1) { Immagine = "led_off.png"; }
+			else { Immagine = "led_on.png"; }
+
+			document.getElementById(ImgNum).src = Immagine;
+			document.getElementById("descrizione").innerHTML = esito;
+		}
+	}
+</script>
+
+</head>
+<font face="Arial">
+<table name="Titolo" border="1" style="width: 456px;" cellpadding="6">
+<tr> <th align="center" colspan="6" >Arduino Yun I/O shield</th></tr>
+</table>
+<table name="Tabella" border="1" cellpadding="6">
+<tr> <th align="center" colspan="6" >Uscite Rele</th></tr>
+<tr>
+<td align="center">
+13
+<br>
+<input type="hidden" name="pin" value="13" id="pin13" />
+<input type="hidden" name="action" value="0" id="action13" />
+<img src="/off.jpg" width="50" id="image13"
+onclick="spedisciRele(document.getElementById('pin13').value,
+document.getElementById('action13').value);"
+/>
+</td>
+<td align="center">
+12
+<br>
+<input type="hidden" name="pin" value="12" id="pin12" />
+<input type="hidden" name="action" value="0" id="action12" />
+<img src="/off.jpg" width="50" id="image12"
+onclick="spedisciRele(document.getElementById('pin12').value,
+document.getElementById('action12').value);"
+/>
+</td>
+<td align="center">
+11
+<br>
+<input type="hidden" name="pin" value="11" id="pin11" />
+<input type="hidden" name="action" value="0" id="action11" />
+<img src="/off.jpg" width="50" id="image11"
+onclick="spedisciRele(document.getElementById('pin11').value,
+document.getElementById('action11').value);"
+/>
+</td>
+<td align="center">
+10
+<br>
+<input type="hidden" name="pin" value="10" id="pin10" />
+<input type="hidden" name="action" value="0" id="action10" />
+<img src="/off.jpg" width="50" id="image10"
+onclick="spedisciRele(document.getElementById('pin10').value,
+document.getElementById('action10').value);"
+/>
+</td>
+<td align="center">
+<br>
+<input type="hidden" name="pin" value="9" id="pin9" />
+<input type="hidden" name="action" value="0" id="action9" />
+<img src="/off.jpg" width="50" id="image9"
+onclick="spedisciRele(document.getElementById('pin9').value,
+document.getElementById('action9').value);"
+/>
+</td>
+<td align="center">
+8
+<br>
+<input type="hidden" name="pin" value="8" id="pin8" />
+<input type="hidden" name="action" value="0" id="action8" />
+<img src="off.jpg" width="50" id="image8"
+onclick="spedisciRele(document.getElementById('pin8').value,
+document.getElementById('action8').value);"
+/>
+</td>
+</tr>
+<tr> <th align="center" colspan="6" >Ingressi ADC</th></tr>
+<tr>
+<td align="center">
+1-A0
+<br>
+<input type="text" style="text-align: center;" name="analogA0" id="analog0" value="0" size="3" readonly/>
+</td>
+<td align="center">
+2-A1
+<br>
+<input type="text" style="text-align: center;" name="analogA1" id="analog1" value="0" size="3" readonly/>
+</td>
+<td align="center">
+3-A2
+<br>
+<input type="text" style="text-align: center;" name="analog3" id="analog2" value="0" size="3" readonly/>
+</td>
+<td align="center">
+4-A3
+<br>
+<input type="text" style="text-align: center;" name="analog4" id="analog3" value="0" size="3" readonly/>
+</td>
+<td align="center">
+5-A4
+<br>
+<input type="text" style="text-align: center;" name="analog5" id="analog4" value="0" size="3" readonly/>
+</td>
+<td align="center">
+6-A5
+<br>
+<input type="text" style="text-align: center;" name="analog6" id="analog5" value="0" size="3" readonly/>
+</td>
+</tr>
+<tr> <th align="center" colspan="6" >Ingressi digitali (2 4 7) e DAC (3 5 6)</th></tr>
+<tr>
+<td align="center">
+2
+<br>
+<img src="led_off.png" width="50" id="image2" />
+</td>
+<td align="center">
+3
+<br>
+<input type="hidden" name="pin" value="3" id="pin3" />
+<input type="range" style="width: 50px; height: 30px;" id="dac3" min="0" max="255" value="0" step="1"
+onchange="spedisciDac(document.getElementById('pin3').value,
+this.value);"
+/>
+<br>
+<span id="ValoreDac3">0</span>
+</td>
+<td align="center">
+4
+<br>
+<img src="led_off.png" width="50" id="image4" />
+</td>
+<td align="center">
+5
+<br>
+<input type="hidden" name="pin" value="5" id="pin5" />
+<input type="range" style="width: 50px; height: 30px;" id="dac5" min="0" max="255" value="0" step="1"
+onchange="spedisciDac(document.getElementById('pin5').value,
+this.value);"
+/>
+<br>
+<span id="ValoreDac5">0</span>
+</td>
+<td align="center">
+6
+<br>
+<input type="hidden" name="pin" value="6" id="pin6" />
+<input type="range" style="width: 50px; height: 30px;" id="dac6" min="0" max="255" value="0" step="1"
+onchange="spedisciDac(document.getElementById('pin6').value,
+this.value);"
+/>
+<br>
+<span id="ValoreDac6">0</span>
+</td>
+<td align="center">
+7
+<br>
+<img src="led_off.png" width="50" id="image7" />
+</td>
+</tr>
+</table>
+<br><br>
+<br><br>
+<p id="descrizione"> - </p>
+</font>
+</html>
